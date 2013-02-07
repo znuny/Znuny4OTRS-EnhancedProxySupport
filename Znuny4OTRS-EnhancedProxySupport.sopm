@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<otrs_package version="1.0">
+    <Name>Znuny4OTRS-EnhancedProxySupport</Name>
+    <Version>1.0.1</Version>
+    <Framework>3.0.x</Framework>
+    <Framework>3.1.x</Framework>
+    <Framework>3.2.x</Framework>
+    <Vendor>Znuny GmbH</Vendor>
+    <URL>http://znuny.com/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <Description Lang="en">Allow to define URL's/Host's which will not used the configured proxy.</Description>
+    <Description Lang="de">Ermöglicht die Konfiguration von URLs/Hosts welche welche nicht über den konfigurierten Proxy laufen sollen.</Description>
+    <Filelist>
+        <File Permission="644" Location="Kernel/Config/Files/Znuny4OTRS-EnhancedProxySupport.xml"/>
+        <File Permission="644" Location="Custom/Kernel/System/WebUserAgent.pm"/>
+    </Filelist>
+    <IntroInstall Type="post" Title="Post-Install Information" Lang="en"><![CDATA[
+        <p>
+        Notice: To configure the Znuny4OTRS Enhanced Proxy Support go to
+            <ol>
+                <li>Admin</li>
+                <li>SysConfig</li>
+                <li>Group "Framework"</li>
+                <li>Subgroup "Core::WebUserAgent"</li>
+            </ol>
+            (<a href="index.pl?Action=AdminSysConfig;Subaction=Edit;SysConfigSubGroup=Core::WebUserAgent;SysConfigGroup=Framework">go here directly</a>)</a>
+        </p>
+    ]]></IntroInstall>
+    <IntroInstall Type="post" Title="Post-Installations-Information" Lang="de"><![CDATA[
+        <p>
+        Anmerkung: Um die Konfigurations-Optionen zu erreichen, gehe zu
+            <ol>
+                <li>Admin</li>
+                <li>SysConfig</li>
+                <li>Gruppe "Framework"</li>
+                <li>Untergruppe "Core::WebUserAgent"</li>
+            </ol>
+            (<a href="index.pl?Action=AdminSysConfig;Subaction=Edit;SysConfigSubGroup=Core::WebUserAgent;SysConfigGroup=CTI">direkter Link in die SysConfig</a>
+        </p>
+    ]]></IntroInstall>
+</otrs_package>
