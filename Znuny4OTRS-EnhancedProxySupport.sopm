@@ -9,8 +9,8 @@
     <Vendor>Znuny GmbH</Vendor>
     <URL>http://znuny.com/</URL>
     <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
-    <Description Lang="en">Allow to define URL's/Host's which will not used the configured proxy.</Description>
-    <Description Lang="de">Ermöglicht die Konfiguration von URLs/Hosts welche welche nicht über den konfigurierten Proxy laufen sollen.</Description>
+    <Description Lang="en">Allows to define URL's/Host's which will not be used by the configured proxy.</Description>
+    <Description Lang="de">Ermöglicht die Konfiguration von URLs/Hosts welche nicht über den konfigurierten Proxy laufen sollen.</Description>
     <Filelist>
         <File Permission="644" Location="Kernel/Config/Files/Znuny4OTRS-EnhancedProxySupport.xml"/>
         <File Permission="644" Location="Custom/Kernel/System/WebUserAgent.pm"/>
