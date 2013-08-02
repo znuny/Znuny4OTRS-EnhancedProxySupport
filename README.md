@@ -1,34 +1,42 @@
+![Znuny logo](http://znuny.com/assets/logo_small.png)
+
+
 Znuny4OTRS - Enhanced Proxy Support
 ===================================
-You use the OTRS http/ftp proxy support to access external RSS feeds and other resources but you want also to use local http/ftp resources (e. g. local package manager as OPM repository). But you have problems to configure this, because you need both (http/ftp proxy for external and just some URL's/host's not).
+You use the OTRS http/ftp proxy support to access external RSS feeds and other resources but you also want to use local http/ftp resources (e. g. local package manager as OPM repository). But you have problems to configure it, because you need both (http/ftp proxy for external and just some URL's/host's). Well here´s your solution!
 
-Feature List
-============
-* Allow to defined host's/URL's in OTRS where no proxy should be used.
+**Feature List**
 
-Configuration
-=============
-* Defined the list in Admin-Interface -> SysConfig -> Group: Framework -> Subgroup: Core::WebUserAgent -> WebUserAgent::NoProxy
+* Allows you to define hosts/URLs in OTRS where no proxy should be used.
 
-Installation
-============
-Download the package and install it via admin interface -> package manager.
+**Prerequisites**
 
-Prerequisites
-* OTRS 3.0
-* OTRS 3.1
-* OTRS 3.2
+- Znuny4OTRS-Repo
 
-Download
-========
-For download see http://znuny.com/d/
+- OTRS 3.1
 
-Commercial Support
-==================
-For this extension and for OTRS in general visit http://znuny.com. Looking forward to hear from you!
+- OTRS 3.2
+
+**Installation**
+
+Download the package and install it via admin interface -> package manager or use Znuny4OTRS-Repo.
+
+**Configuration**
+
+* Define the list in Admin-Interface -> SysConfig -> Group: Framework -> Subgroup: Core::WebUserAgent -> WebUserAgent::NoProxy
+
+**Download**
+
+For download see [http://znuny.com/d/](http://znuny.com/d/)
+
+**Commercial Support**
+
+For this extension and for OTRS in general visit [http://znuny.com](http://znuny.com). Looking forward to hear from you!
 
 Enjoy!
 
  Your Znuny Team!
- http://znuny.com
+
+ [http://znuny.com](http://znuny.com)
+
 
