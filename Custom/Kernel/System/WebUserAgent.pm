@@ -3,7 +3,7 @@
 # Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
 # Copyright (C) 2013 Znuny GmbH, http://znuny.com/
 # --
-# $Id: WebUserAgent.pm,v 1.7 2012/11/20 15:41:40 mh Exp $
+# $Id: $
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -89,7 +89,7 @@ sub new {
     }
 
     $Self->{Timeout} = $Param{Timeout} || $Self->{ConfigObject}->Get('WebUserAgent::Timeout') || 15;
-    $Self->{Proxy} = $Param{Proxy} || $Self->{ConfigObject}->Get('WebUserAgent::Proxy');
+    $Self->{Proxy} = $Param{Proxy} || $Self->{ConfigObject}->Get('WebUserAgent::Proxy') || '';
     $Self->{NoProxy} = $Param{NoProxy} || $Self->{ConfigObject}->Get('WebUserAgent::NoProxy');
 
     return $Self;
@@ -115,20 +115,61 @@ returns
 sub Request {
     my ( $Self, %Param ) = @_;
 
-    # init agent
-    my $UserAgent = LWP::UserAgent->new();
+    my $Response;
 
-    # set timeout
-    $UserAgent->timeout( $Self->{Timeout} );
+    {
+        # set HTTPS proxy for ssl requests, localize %ENV because of mod_perl
+        local %ENV = %ENV;
 
-    # set user agent
-    $UserAgent->agent(
-        $Self->{ConfigObject}->Get('Product') . ' ' . $Self->{ConfigObject}->Get('Version')
-    );
+        # if a proxy is set, extract it and use it as environment variables for HTTPS
+        if ( defined $Self->{Proxy} && $Self->{Proxy} =~ /:\/\/(.*)\// ) {
+            my $ProxyAddress = $1;
 
-    # set proxy
-    if ( $Self->{Proxy} ) {
-        $UserAgent->proxy( [ 'http', 'https', 'ftp' ], $Self->{Proxy} );
+            # set no proxy if needed
+            my $NoProxy;
+            if ( $Self->{NoProxy} ) {
+                my @Hosts = split /;/, $Self->{NoProxy};
+                for my $Host (@Hosts) {
+                    next if !$Host;
+                    next if $Param{URL} !~ /\Q$Host\E/i;
+                    $NoProxy = 1;
+                    last;
+                }
+            }
+
+            if ( !$NoProxy ) {
+                # extract authentication information if needed
+                if ( $ProxyAddress =~ /(.*):(.*)@(.*)/ ) {
+                    $ENV{HTTPS_PROXY_USERNAME} = $1;
+                    $ENV{HTTPS_PROXY_PASSWORD} = $2;
+                    $ProxyAddress              = $3;
+                }
+                $ENV{HTTPS_PROXY} = $ProxyAddress;
+            }
+        }
+
+        # force Net::SSL from Crypt::SSLeay. It does SSL connections through proxies
+        # but it can't verify hostnames
+        $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "Net::SSL";
+        $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME}    = 0;
+
+
+        # init agent
+        my $UserAgent = LWP::UserAgent->new();
+
+        # set timeout
+        $UserAgent->timeout( $Self->{Timeout} );
+
+        # set user agent
+        $UserAgent->agent(
+            $Self->{ConfigObject}->Get('Product') . ' ' . $Self->{ConfigObject}->Get('Version')
+        );
+
+        # set proxy - but only for non-https urls, the https urls must use the environment
+        # variables:
+        if ( $Self->{Proxy} && $Param{URL} !~ /^https/ ) {
+            $UserAgent->proxy( [ 'http', 'ftp' ], $Self->{Proxy} );
+        }
 
         # set no proxy
         if ( $Self->{NoProxy} ) {
@@ -140,18 +181,18 @@ sub Request {
             }
             $UserAgent->no_proxy(@HostsCleanList);
         }
-    }
 
-    # get file
-    my $Response = $UserAgent->get( $Param{URL} );
-    if ( !$Response->is_success() ) {
-        $Self->{LogObject}->Log(
-            Priority => 'error',
-            Message  => "Can't get file from $Param{URL}: " . $Response->status_line(),
-        );
-        return (
-            Status => $Response->status_line(),
-        );
+        # get file
+        $Response = $UserAgent->get( $Param{URL} );
+        if ( !$Response->is_success() ) {
+            $Self->{LogObject}->Log(
+                Priority => 'error',
+                Message  => "Can't get file from $Param{URL}: " . $Response->status_line(),
+            );
+            return (
+                Status => $Response->status_line(),
+            );
+        }
     }
 
     # return request
