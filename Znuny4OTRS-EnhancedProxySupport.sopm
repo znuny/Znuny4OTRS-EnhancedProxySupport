@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <otrs_package version="1.0">
     <Name>Znuny4OTRS-EnhancedProxySupport</Name>
-    <Version>1.0.7</Version>
+    <Version>1.0.8</Version>
+    <ChangeLog Version="1.0.8" Date="2013-10-17 13:46:11 +0200">Update to latest framework file.</ChangeLog>
     <Framework>3.0.x</Framework>
     <Framework>3.1.x</Framework>
     <Framework>3.2.x</Framework>
@@ -14,6 +15,7 @@
     <Filelist>
         <File Permission="644" Location="Kernel/Config/Files/Znuny4OTRS-EnhancedProxySupport.xml"/>
         <File Permission="644" Location="Custom/Kernel/System/WebUserAgent.pm"/>
+        <File Location="doc/de/Znuny4OTRS-EnhancedProxySupport.pdf" Permission="644"/>
     </Filelist>
     <IntroInstall Type="post" Title="Post-Install Information" Lang="en"><![CDATA[
         <p>
