@@ -1,9 +1,7 @@
 # --
 # Kernel/System/WebUserAgent.pm - a web user agent
-# Copyright (C) 2001-2012 OTRS AG, http://otrs.org/
+# Copyright (C) 2001-2013 OTRS AG, http://otrs.com/
 # Copyright (C) 2013 Znuny GmbH, http://znuny.com/
-# --
-# $Id: $
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -17,8 +15,7 @@ use warnings;
 
 use LWP::UserAgent;
 
-use vars qw(@ISA $VERSION);
-$VERSION = qw($Revision: 1.7 $) [1];
+use vars qw(@ISA);
 
 =head1 NAME
 
@@ -89,7 +86,7 @@ sub new {
     }
 
     $Self->{Timeout} = $Param{Timeout} || $Self->{ConfigObject}->Get('WebUserAgent::Timeout') || 15;
-    $Self->{Proxy} = $Param{Proxy} || $Self->{ConfigObject}->Get('WebUserAgent::Proxy') || '';
+    $Self->{Proxy}   = $Param{Proxy}   || $Self->{ConfigObject}->Get('WebUserAgent::Proxy')   || '';
     $Self->{NoProxy} = $Param{NoProxy} || $Self->{ConfigObject}->Get('WebUserAgent::NoProxy');
 
     return $Self;
@@ -145,14 +142,13 @@ sub Request {
                     $ProxyAddress              = $3;
                 }
                 $ENV{HTTPS_PROXY} = $ProxyAddress;
+
+                # force Net::SSL from Crypt::SSLeay. It does SSL connections through proxies
+                # but it can't verify hostnames
+                $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "Net::SSL";
+                $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME}    = 0;
             }
         }
-
-        # force Net::SSL from Crypt::SSLeay. It does SSL connections through proxies
-        # but it can't verify hostnames
-        $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "Net::SSL";
-        $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME}    = 0;
-
 
         # init agent
         my $UserAgent = LWP::UserAgent->new();
@@ -213,11 +209,5 @@ This software is part of the OTRS project (L<http://otrs.org/>).
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
 the enclosed file COPYING for license information (AGPL). If you
 did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
-
-=cut
-
-=head1 VERSION
-
-$Revision: 1.7 $ $Date: 2012/11/20 15:41:40 $
 
 =cut
