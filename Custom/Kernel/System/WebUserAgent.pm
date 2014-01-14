@@ -1,7 +1,7 @@
 # --
 # Kernel/System/WebUserAgent.pm - a web user agent
 # Copyright (C) 2001-2013 OTRS AG, http://otrs.com/
-# Copyright (C) 2013 Znuny GmbH, http://znuny.com/
+# Copyright (C) 2014 Znuny GmbH, http://znuny.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -94,17 +94,35 @@ sub new {
 
 =item Request()
 
-return the content of requested URL
+return the content of requested URL.
+
+Simple GET request:
 
     my %Response = $WebUserAgentObject->Request(
         URL => 'http://example.com/somedata.xml',
     );
 
+Or a POST request; attributes can be a hashref like this:
+
+    my %Response = $WebUserAgentObject->Request(
+        URL  => 'http://example.com/someurl',
+        Type => 'POST',
+        Data => { Attribute1 => 'Value', Attribute2 => 'Value2' },
+    );
+
+alternatively, you can use an arrayref like this:
+
+    my %Response = $WebUserAgentObject->Request(
+        URL  => 'http://example.com/someurl',
+        Type => 'POST',
+        Data => [ Attribute => 'Value', Attribute => 'OtherValue' ],
+    );
+
 returns
 
     %Response = (
-        Status  => 200,         # http status
-        Content => $ContentRef, # content of requested site
+        Status  => '200 OK',    # http status
+        Content => $ContentRef, # content of requested URL
     );
 
 =cut
@@ -112,9 +130,13 @@ returns
 sub Request {
     my ( $Self, %Param ) = @_;
 
+    # define method - default to GET
+    $Param{Type} ||= 'GET';
+
     my $Response;
 
     {
+
         # set HTTPS proxy for ssl requests, localize %ENV because of mod_perl
         local %ENV = %ENV;
 

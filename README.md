@@ -13,9 +13,13 @@ You use the OTRS http/ftp proxy support to access external RSS feeds and other r
 
 - Znuny4OTRS-Repo
 
+- OTRS 3.0
+
 - OTRS 3.1
 
 - OTRS 3.2
+
+- OTRS 3.3
 
 **Installation**
 
@@ -27,7 +31,7 @@ Download the package and install it via admin interface -> package manager or us
 
 **Download**
 
-For download see [http://znuny.com/d/](http://znuny.com/d/)
+For download see [http://znuny.com/en/#!/addons](http://znuny.com/en/#!/addons)
 
 **Commercial Support**
 
@@ -38,5 +42,4 @@ Enjoy!
  Your Znuny Team!
 
  [http://znuny.com](http://znuny.com)
-
 
