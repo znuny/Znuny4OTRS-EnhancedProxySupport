@@ -13,13 +13,7 @@ You use the OTRS http/ftp proxy support to access external RSS feeds and other r
 
 - Znuny4OTRS-Repo
 
-- OTRS 3.0
-
-- OTRS 3.1
-
-- OTRS 3.2
-
-- OTRS 3.3
+- OTRS 4
 
 **Installation**
 
@@ -42,4 +36,3 @@ Enjoy!
  Your Znuny Team!
 
  [http://znuny.com](http://znuny.com)
-
