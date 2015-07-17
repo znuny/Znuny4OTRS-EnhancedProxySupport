@@ -70,7 +70,7 @@ sub new {
 # ---
 # Znuny4OTRS-EnhancedProxySupport
 # ---
-    $Self->{NoProxy} = $Param{NoProxy} || $Self->{ConfigObject}->Get('WebUserAgent::NoProxy');
+    $Self->{NoProxy} = $Param{NoProxy} || $ConfigObject->Get('WebUserAgent::NoProxy');
 # ---
     return $Self;
 }
