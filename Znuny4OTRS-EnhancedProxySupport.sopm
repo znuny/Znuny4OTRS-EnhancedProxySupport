@@ -38,7 +38,7 @@
                 <li>Gruppe "Framework"</li>
                 <li>Untergruppe "Core::WebUserAgent"</li>
             </ol>
-            (<a href="index.pl?Action=AdminSysConfig;Subaction=Edit;SysConfigSubGroup=Core::WebUserAgent;SysConfigGroup=CTI">direkter Link in die SysConfig</a>
+            (<a href="index.pl?Action=AdminSysConfig;Subaction=Edit;SysConfigSubGroup=Core::WebUserAgent;SysConfigGroup=Framework">direkter Link in die SysConfig</a>
         </p>
     ]]></IntroInstall>
 </otrs_package>
