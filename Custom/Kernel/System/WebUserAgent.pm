@@ -247,10 +247,18 @@ sub Request {
         my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
         # set user agent
-        $UserAgent->agent(
-            $ConfigObject->Get('Product') . ' ' . $ConfigObject->Get('Version')
-        );
+# ---
+# Znuny4OTRS-EnhancedProxySupport
+# ---
+#         $UserAgent->agent(
+#             $ConfigObject->Get('Product') . ' ' . $ConfigObject->Get('Version')
+#         );
+#
+        my $UserAgentString   = $Kernel::OM->Get('Kernel::Config')->Get('WebUserAgentString::UserAgentString');
+        $UserAgentString    ||= $ConfigObject->Get('Product') . ' ' . $ConfigObject->Get('Version');
 
+        $UserAgent->agent($UserAgentString);
+# ---
         # set proxy - but only for non-https urls, the https urls must use the environment
         # variables:
         if ( $Self->{Proxy} && $Param{URL} !~ /^https/ ) {
