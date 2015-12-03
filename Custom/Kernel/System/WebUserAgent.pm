@@ -1,9 +1,8 @@
 # --
-# Kernel/System/WebUserAgent.pm - a web user agent
 # Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 # Copyright (C) 2012-2015 Znuny GmbH, http://znuny.com/
 # --
-# $origin: https://github.com/OTRS/otrs/blob/e505154f2bfb3be8b817d8a02e36d7cd1aaf3420/Kernel/System/WebUserAgent.pm
+# $origin: https://github.com/OTRS/otrs/blob/5a8c531f122fbf9019cc08e5b2965a2f2ba0e469/Kernel/System/WebUserAgent.pm
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -67,11 +66,13 @@ sub new {
 
     $Self->{Timeout} = $Param{Timeout} || $ConfigObject->Get('WebUserAgent::Timeout') || 15;
     $Self->{Proxy}   = $Param{Proxy}   || $ConfigObject->Get('WebUserAgent::Proxy')   || '';
+
 # ---
 # Znuny4OTRS-EnhancedProxySupport
 # ---
     $Self->{NoProxy} = $Param{NoProxy} || $ConfigObject->Get('WebUserAgent::NoProxy');
 # ---
+
     return $Self;
 }
 
@@ -144,112 +145,83 @@ sub Request {
 
     my $Response;
 
-    {
-        # Set HTTPS proxy for ssl requests. We must not use "local %ENV" here!
-        # See http://bugs.otrs.org/show_bug.cgi?id=10577.
-        # It should also not be needed as we have PerlOptions +SetupEnv in our apache
-        #   configuration, and %ENV will be repopulated for every request.
+# ---
+# Znuny4OTRS-EnhancedProxySupport
+# ---
+    if ( $Self->{Proxy} =~ /:\/\/(.*)\// ) {
+        my $ProxyAddress = $1;
 
-        # if a proxy is set, extract it and use it as environment variables for HTTPS
-        if ( $Self->{Proxy} =~ /:\/\/(.*)\// ) {
-            my $ProxyAddress = $1;
+        # set no proxy if needed
+        my $NoProxy;
+        if ( $Self->{NoProxy} ) {
+            my @Hosts = split /;/, $Self->{NoProxy};
+            HOST:
+            for my $Host (@Hosts) {
+                next HOST if !$Host;
+                next HOST if $Param{URL} !~ /\Q$Host\E/i;
+                $NoProxy = 1;
+                last HOST;
+            }
+        }
+
+        if ( !$NoProxy ) {
+            # extract authentication information if needed
+            if ( $ProxyAddress =~ /(.*):(.*)@(.*)/ ) {
+                $ENV{HTTPS_PROXY_USERNAME} = $1;
+                $ENV{HTTPS_PROXY_PASSWORD} = $2;
+                $ProxyAddress              = $3;
+            }
+            $ENV{HTTPS_PROXY} = $ProxyAddress;
+
+            # force Net::SSL from Crypt::SSLeay. It does SSL connections through proxies
+            # but it can't verify hostnames
+            $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "Net::SSL";
+            $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME}    = 0;
+        }
+    }
+# ---
+
+    # init agent
+    my $UserAgent = LWP::UserAgent->new();
+
+    # In some scenarios like transparent HTTPS proxies, it can be neccessary to turn off
+    #   SSL certificate validation.
+    if ( $Kernel::OM->Get('Kernel::Config')->Get('WebUserAgent::DisableSSLVerification') ) {
+        $UserAgent->ssl_opts(
+            verify_hostname => 0,
+        );
+    }
+
+    # set credentials
+    if ( $Param{Credentials} ) {
+        my %CredentialParams    = %{ $Param{Credentials} || {} };
+        my @Keys                = qw(Location Realm User Password);
+        my $AllCredentialParams = !first { !defined $_ } @CredentialParams{@Keys};
+
+        if ($AllCredentialParams) {
+            $UserAgent->credentials(
+                @CredentialParams{@Keys},
+            );
+        }
+    }
+
+    # set headers
+    if ( $Param{Header} ) {
+        $UserAgent->default_headers(
+            HTTP::Headers->new( %{ $Param{Header} } ),
+        );
+    }
+
+    # set timeout
+    $UserAgent->timeout( $Self->{Timeout} );
+
+    # get database object
+    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
 # ---
 # Znuny4OTRS-EnhancedProxySupport
 # ---
-#             # extract authentication information if needed
-#             if ( $ProxyAddress =~ /(.*):(.*)@(.*)/ ) {
-#                 $ENV{HTTPS_PROXY_USERNAME} = $1;
-#                 $ENV{HTTPS_PROXY_PASSWORD} = $2;
-#                 $ProxyAddress              = $3;
-#             }
-#             $ENV{HTTPS_PROXY} = $ProxyAddress;
-#
-#             # force Net::SSL from Crypt::SSLeay. It does SSL connections through proxies
-#             # but it can't verify hostnames
-#             $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "Net::SSL";
-#             $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME}    = 0;
-
-            # set no proxy if needed
-            my $NoProxy;
-            if ( $Self->{NoProxy} ) {
-                my @Hosts = split /;/, $Self->{NoProxy};
-                HOST:
-                for my $Host (@Hosts) {
-                    next HOST if !$Host;
-                    next HOST if $Param{URL} !~ /\Q$Host\E/i;
-                    $NoProxy = 1;
-                    last HOST;
-                }
-            }
-
-            if ( !$NoProxy ) {
-                # extract authentication information if needed
-                if ( $ProxyAddress =~ /(.*):(.*)@(.*)/ ) {
-                    $ENV{HTTPS_PROXY_USERNAME} = $1;
-                    $ENV{HTTPS_PROXY_PASSWORD} = $2;
-                    $ProxyAddress              = $3;
-                }
-                $ENV{HTTPS_PROXY} = $ProxyAddress;
-
-                # force Net::SSL from Crypt::SSLeay. It does SSL connections through proxies
-                # but it can't verify hostnames
-                $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "Net::SSL";
-                $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME}    = 0;
-            }
-# ---
-        }
-
-        # init agent
-        my $UserAgent = LWP::UserAgent->new();
-
-        # In some scenarios like transparent HTTPS proxies, it can be neccessary to turn off
-        #   SSL certificate validation.
-        if ( $Kernel::OM->Get('Kernel::Config')->Get('WebUserAgent::DisableSSLVerification') ) {
-            my $Loaded = $Kernel::OM->Get('Kernel::System::Main')->Require(
-                'Net::SSLeay',
-                Silent => 1,
-            );
-            if ($Loaded) {
-                $UserAgent->ssl_opts(
-                    verify_hostname => 0,
-                );
-                $UserAgent->ssl_opts(
-                    SSL_verify_mode => Net::SSLeay::VERIFY_NONE(),
-                );
-            }
-        }
-
-        # set credentials
-        if ( $Param{Credentials} ) {
-            my %CredentialParams    = %{ $Param{Credentials} || {} };
-            my @Keys                = qw(Location Realm User Password);
-            my $AllCredentialParams = !first { !defined $_ } @CredentialParams{@Keys};
-
-            if ($AllCredentialParams) {
-                $UserAgent->credentials(
-                    @CredentialParams{@Keys},
-                );
-            }
-        }
-
-        # set headers
-        if ( $Param{Header} ) {
-            $UserAgent->default_headers(
-                HTTP::Headers->new( %{ $Param{Header} } ),
-            );
-        }
-
-        # set timeout
-        $UserAgent->timeout( $Self->{Timeout} );
-
-        # get database object
-        my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-
-        # set user agent
-# ---
-# Znuny4OTRS-EnhancedProxySupport
-# ---
+#         # set user agent
 #         $UserAgent->agent(
 #             $ConfigObject->Get('Product') . ' ' . $ConfigObject->Get('Version')
 #         );
@@ -257,13 +229,14 @@ sub Request {
         my $UserAgentString   = $Kernel::OM->Get('Kernel::Config')->Get('WebUserAgentString::UserAgentString');
         $UserAgentString    ||= $ConfigObject->Get('Product') . ' ' . $ConfigObject->Get('Version');
 
+        # set user agent
         $UserAgent->agent($UserAgentString);
 # ---
-        # set proxy - but only for non-https urls, the https urls must use the environment
-        # variables:
-        if ( $Self->{Proxy} && $Param{URL} !~ /^https/ ) {
-            $UserAgent->proxy( [ 'http', 'ftp' ], $Self->{Proxy} );
-        }
+
+    # set proxy
+    if ( $Self->{Proxy} ) {
+        $UserAgent->proxy( [ 'http', 'https', 'ftp' ], $Self->{Proxy} );
+    }
 
 # ---
 # Znuny4OTRS-EnhancedProxySupport
@@ -281,28 +254,28 @@ sub Request {
         }
 # ---
 
-        if ( $Param{Type} eq 'GET' ) {
+    if ( $Param{Type} eq 'GET' ) {
 
-            # perform get request on URL
-            $Response = $UserAgent->get( $Param{URL} );
-        }
-
-        else {
-
-            # check for Data param
-            if ( !IsArrayRefWithData( $Param{Data} ) && !IsHashRefWithData( $Param{Data} ) ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
-                    Priority => 'error',
-                    Message =>
-                        'WebUserAgent POST: Need Data param containing a hashref or arrayref with data.',
-                );
-                return ( Status => 0 );
-            }
-
-            # perform post request plus data
-            $Response = $UserAgent->post( $Param{URL}, $Param{Data} );
-        }
+        # perform get request on URL
+        $Response = $UserAgent->get( $Param{URL} );
     }
+
+    else {
+
+        # check for Data param
+        if ( !IsArrayRefWithData( $Param{Data} ) && !IsHashRefWithData( $Param{Data} ) ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message =>
+                    'WebUserAgent POST: Need Data param containing a hashref or arrayref with data.',
+            );
+            return ( Status => 0 );
+        }
+
+        # perform post request plus data
+        $Response = $UserAgent->post( $Param{URL}, $Param{Data} );
+    }
+
     if ( !$Response->is_success() ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
