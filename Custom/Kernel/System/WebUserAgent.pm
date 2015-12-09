@@ -145,42 +145,6 @@ sub Request {
 
     my $Response;
 
-# ---
-# Znuny4OTRS-EnhancedProxySupport
-# ---
-    if ( $Self->{Proxy} =~ /:\/\/(.*)\// ) {
-        my $ProxyAddress = $1;
-
-        # set no proxy if needed
-        my $NoProxy;
-        if ( $Self->{NoProxy} ) {
-            my @Hosts = split /;/, $Self->{NoProxy};
-            HOST:
-            for my $Host (@Hosts) {
-                next HOST if !$Host;
-                next HOST if $Param{URL} !~ /\Q$Host\E/i;
-                $NoProxy = 1;
-                last HOST;
-            }
-        }
-
-        if ( !$NoProxy ) {
-            # extract authentication information if needed
-            if ( $ProxyAddress =~ /(.*):(.*)@(.*)/ ) {
-                $ENV{HTTPS_PROXY_USERNAME} = $1;
-                $ENV{HTTPS_PROXY_PASSWORD} = $2;
-                $ProxyAddress              = $3;
-            }
-            $ENV{HTTPS_PROXY} = $ProxyAddress;
-
-            # force Net::SSL from Crypt::SSLeay. It does SSL connections through proxies
-            # but it can't verify hostnames
-            $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "Net::SSL";
-            $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME}    = 0;
-        }
-    }
-# ---
-
     # init agent
     my $UserAgent = LWP::UserAgent->new();
 
