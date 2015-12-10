@@ -3,7 +3,7 @@
     <Name>Znuny4OTRS-EnhancedProxySupport</Name>
     <Version>1.2.4</Version>
     <Framework>5.0.x</Framework>
-    <PackageRequired Version="3.0.0">Znuny4OTRS-Repo</PackageRequired>
+    <PackageRequired Version="3.0.7">Znuny4OTRS-Repo</PackageRequired>
     <Vendor>Znuny GmbH</Vendor>
     <URL>http://znuny.com/</URL>
     <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
