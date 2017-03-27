@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <otrs_package version="1.0">
     <Name>Znuny4OTRS-EnhancedProxySupport</Name>
-    <Version>1.2.4</Version>
+    <Version>5.0.0</Version>
+    <ChangeLog Version="5.0.0" Date="2017-03-27 09:31:10 +0200">Ported to OTRS 5.0.</ChangeLog>
     <Framework>5.0.x</Framework>
     <PackageRequired Version="3.0.7">Znuny4OTRS-Repo</PackageRequired>
     <Vendor>Znuny GmbH</Vendor>
