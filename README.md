@@ -13,7 +13,7 @@ You use the OTRS http/ftp proxy support to access external RSS feeds and other r
 
 - Znuny4OTRS-Repo
 
-- OTRS 5
+- OTRS 6
 
 **Installation**
 

@@ -2,8 +2,8 @@ This setting can be added to your Kernel/Config.pm or changed in the SysConfig t
 
 # URLs/Hosts which should bypass the proxy server
 
-"WebUserAgent::NoProxy" can be configured via Admin-Interface -> SysConfig -> Framework -> Core::WebUserAgent.
+"WebUserAgent::NoProxy" can be configured via Admin-Interface -> SysConfig -> Core -> WebUserAgent.
 
 # Name of the UserAgent
 
-"WebUserAgent::UserAgent" via  Admin-Interface -> SysConfig -> Framework -> Core::WebUserAgent changeable.
+"WebUserAgent::UserAgent" via  Admin-Interface -> SysConfig -> Core -> WebUserAgent changeable.

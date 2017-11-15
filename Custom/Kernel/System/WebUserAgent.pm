@@ -2,7 +2,7 @@
 # Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
 # Copyright (C) 2012-2017 Znuny GmbH, http://znuny.com/
 # --
-# $origin: otrs - 5a8c531f122fbf9019cc08e5b2965a2f2ba0e469 - Kernel/System/WebUserAgent.pm
+# $origin: otrs - 5e62242b2507ce4e922bc66680ec7db4245bc8c7 - Kernel/System/WebUserAgent.pm
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -35,17 +35,13 @@ our @ObjectDependencies = (
 
 Kernel::System::WebUserAgent - a web user agent lib
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 All web user agent functions.
 
 =head1 PUBLIC INTERFACE
 
-=over 4
-
-=cut
-
-=item new()
+=head2 new()
 
 create an object
 
@@ -80,7 +76,7 @@ sub new {
     return $Self;
 }
 
-=item Request()
+=head2 Request()
 
 return the content of requested URL.
 
@@ -88,6 +84,8 @@ Simple GET request:
 
     my %Response = $WebUserAgentObject->Request(
         URL => 'http://example.com/somedata.xml',
+        SkipSSLVerification => 1, # (optional)
+        NoLog               => 1, # (optional)
     );
 
 Or a POST request; attributes can be a hashref like this:
@@ -96,6 +94,8 @@ Or a POST request; attributes can be a hashref like this:
         URL  => 'http://example.com/someurl',
         Type => 'POST',
         Data => { Attribute1 => 'Value', Attribute2 => 'Value2' },
+        SkipSSLVerification => 1, # (optional)
+        NoLog               => 1, # (optional)
     );
 
 alternatively, you can use an arrayref like this:
@@ -104,6 +104,8 @@ alternatively, you can use an arrayref like this:
         URL  => 'http://example.com/someurl',
         Type => 'POST',
         Data => [ Attribute => 'Value', Attribute => 'OtherValue' ],
+        SkipSSLVerification => 1, # (optional)
+        NoLog               => 1, # (optional)
     );
 
 returns
@@ -123,6 +125,8 @@ You can even pass some headers
             Authorization => 'Basic xxxx',
             Content_Type  => 'text/json',
         },
+        SkipSSLVerification => 1, # (optional)
+        NoLog               => 1, # (optional)
     );
 
 If you need to set credentials
@@ -137,6 +141,8 @@ If you need to set credentials
             Realm    => 'OTRS Unittests',
             Location => 'ftp.otrs.org:80',
         },
+        SkipSSLVerification => 1, # (optional)
+        NoLog               => 1, # (optional)
     );
 
 =cut
@@ -154,7 +160,11 @@ sub Request {
 
     # In some scenarios like transparent HTTPS proxies, it can be neccessary to turn off
     #   SSL certificate validation.
-    if ( $Kernel::OM->Get('Kernel::Config')->Get('WebUserAgent::DisableSSLVerification') ) {
+    if (
+        $Param{SkipSSLVerification}
+        || $Kernel::OM->Get('Kernel::Config')->Get('WebUserAgent::DisableSSLVerification')
+        )
+    {
         $UserAgent->ssl_opts(
             verify_hostname => 0,
         );
@@ -194,7 +204,7 @@ sub Request {
 #             $ConfigObject->Get('Product') . ' ' . $ConfigObject->Get('Version')
 #         );
 #
-        my $UserAgentString   = $Kernel::OM->Get('Kernel::Config')->Get('WebUserAgentString::UserAgentString');
+        my $UserAgentString   = $ConfigObject->Get('WebUserAgentString::UserAgentString');
         $UserAgentString    ||= $ConfigObject->Get('Product') . ' ' . $ConfigObject->Get('Version');
 
         # set user agent
@@ -209,17 +219,17 @@ sub Request {
 # ---
 # Znuny4OTRS-EnhancedProxySupport
 # ---
-        # set no proxy
-        if ( $Self->{NoProxy} ) {
-            my @Hosts = split /;/, $Self->{NoProxy};
-            my @HostsCleanList;
-            HOST:
-            for my $Host (@Hosts) {
-                next HOST if !$Host;
-                push @HostsCleanList, $Host;
-            }
-            $UserAgent->no_proxy(@HostsCleanList);
+    # set no proxy
+    if ( $Self->{NoProxy} ) {
+        my @Hosts = split /;/, $Self->{NoProxy};
+        my @HostsCleanList;
+        HOST:
+        for my $Host (@Hosts) {
+            next HOST if !$Host;
+            push @HostsCleanList, $Host;
         }
+        $UserAgent->no_proxy(@HostsCleanList);
+    }
 # ---
 
     if ( $Param{Type} eq 'GET' ) {
@@ -245,10 +255,14 @@ sub Request {
     }
 
     if ( !$Response->is_success() ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "Can't perform $Param{Type} on $Param{URL}: " . $Response->status_line(),
-        );
+
+        if ( !$Param{NoLog} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Can't perform $Param{Type} on $Param{URL}: " . $Response->status_line(),
+            );
+        }
+
         return (
             Status => $Response->status_line(),
         );
@@ -273,8 +287,6 @@ sub Request {
 }
 
 1;
-
-=back
 
 =head1 TERMS AND CONDITIONS
 

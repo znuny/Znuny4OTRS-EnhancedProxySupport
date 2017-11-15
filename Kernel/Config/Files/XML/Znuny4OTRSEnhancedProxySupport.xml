@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<otrs_config version="2.0" init="Application">
+    <Setting Name="WebUserAgent::NoProxy" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">Defines the URLs/Hosts for http/ftp, where no proxy is used.</Description>
+        <Navigation>Core::WebUserAgent</Navigation>
+        <Value>
+            <Item ValueType="String" ValueRegex="">host1.example.com;host2.example.com</Item>
+        </Value>
+    </Setting>
+    <Setting Name="WebUserAgent::UserAgent" Required="0" Valid="0" ConfigLevel="205">
+        <Description Translatable="1">Configure the content of the UserAgent header.</Description>
+        <Navigation>Core::WebUserAgent</Navigation>
+        <Value>
+            <Item ValueType="String" ValueRegex=""></Item>
+        </Value>
+    </Setting>
+</otrs_config>
