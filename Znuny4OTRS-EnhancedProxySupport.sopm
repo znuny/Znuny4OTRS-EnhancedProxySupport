@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <otrs_package version="1.0">
     <Name>Znuny4OTRS-EnhancedProxySupport</Name>
-    <Version>6.0.2</Version>
+    <Version>6.0.3</Version>
+    <ChangeLog Version="6.0.3" Date="2019-05-14 09:48:49 +0200">Fixed Typo for 'WebUserAgent::UserAgent' config.</ChangeLog>
     <ChangeLog Version="6.0.2" Date="2019-01-10 16:09:22 +0100">Tidied code.</ChangeLog>
     <ChangeLog Version="6.0.1" Date="2017-11-15 13:42:22 +0100">Ported to OTRS 6.</ChangeLog>
     <ChangeLog Version="5.0.0" Date="2017-03-27 09:31:10 +0200">Ported to OTRS 5.0.</ChangeLog>
