@@ -204,7 +204,7 @@ sub Request {
 #             $ConfigObject->Get('Product') . ' ' . $ConfigObject->Get('Version')
 #         );
 #
-        my $UserAgentString   = $ConfigObject->Get('WebUserAgentString::UserAgentString');
+        my $UserAgentString   = $ConfigObject->Get('WebUserAgent::UserAgent');
         $UserAgentString    ||= $ConfigObject->Get('Product') . ' ' . $ConfigObject->Get('Version');
 
         # set user agent
