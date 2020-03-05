@@ -1,4 +1,7 @@
-![Znuny logo](http://znuny.com/assets/images/logo_small.png)
+![Znuny logo](https://www.znuny.com/assets/images/logo_small.png)
+
+
+![Build status](https://badge.proxy.znuny.com/Znuny4OTRS-EnhancedProxySupport/master)
 
 
 Znuny4OTRS - Enhanced Proxy Support
@@ -7,32 +10,31 @@ You use the OTRS http/ftp proxy support to access external RSS feeds and other r
 
 **Feature List**
 
-* Allows you to define hosts/URLs in OTRS where no proxy should be used.
+- Allows you to define hosts/URLs in OTRS where no proxy should be used.
 
 **Prerequisites**
 
-- Znuny4OTRS-Repo
-
 - OTRS 6
+- [Znuny4OTRS-Repo](https://www.znuny.com/add-ons/znuny4otrs-repository)
 
 **Installation**
 
-Download the package and install it via admin interface -> package manager or use Znuny4OTRS-Repo.
+Download the [package](https://addons.znuny.com/api/addon_repos/public/1093/latest) and install it via admin interface -> package manager or use [Znuny4OTRS-Repo](https://www.znuny.com/add-ons/znuny4otrs-repository).
 
 **Configuration**
 
-* Define the list in Admin-Interface -> SysConfig -> Group: Framework -> Subgroup: Core::WebUserAgent -> WebUserAgent::NoProxy
+* Configure exceptions for proxy usage via System Configuration. Add the domains which should not be access by aa proxy to the setting `WebUserAgent::NoProxy`.
 
 **Download**
 
-For download see [http://znuny.com/en/#!/addons](http://znuny.com/en/#!/addons)
+Download the [latest version](https://addons.znuny.com/api/addon_repos/public/1093/latest).
 
 **Commercial Support**
 
-For this extension and for OTRS in general visit [http://znuny.com](http://znuny.com). Looking forward to hear from you!
+For this add-on and for OTRS in general visit [www.znuny.com](https://www.znuny.com). Looking forward to hear from you!
 
 Enjoy!
 
- Your Znuny Team!
+Your Znuny Team!
 
- [http://znuny.com](http://znuny.com)
+[https://www.znuny.com](https://www.znuny.com)
