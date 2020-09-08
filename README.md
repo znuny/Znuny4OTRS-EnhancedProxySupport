@@ -6,6 +6,9 @@
 
 Znuny4OTRS - Enhanced Proxy Support
 ===================================
+
+**DEPRECATED FOR OTRS 6. Use Znuny4OTRS-WebUserAgent instead**
+
 You use the OTRS http/ftp proxy support to access external RSS feeds and other resources but you also want to use local http/ftp resources (e. g. local package manager as OPM repository). But you have problems to configure it, because you need both (http/ftp proxy for external and just some URL's/host's). Well here´s your solution!
 
 **Feature List**
